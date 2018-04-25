@@ -14,7 +14,7 @@ def getHTMLText(url):
 
 def getTeamNames():
     text = getHTMLText("https://www.basketball-reference.com/")
-    teams = re.findall(r"value=\"[A-Z]{3}\".*?<", text);
+    teams = re.findall(r"value=\"[A-Z]{3}\".*?<", text)
     for i in range(len(teams)):
         words = teams[i].split(" ")
         teams[i] = words[len(words) - 1][0:-1].lower()
@@ -23,22 +23,10 @@ def getTeamNames():
 def getScoresDiff(teams):
     ret = {}
     for team in teams:
-        link = "https://nba.hupu.com/schedule/" + team
-        html = getHTMLText(link)
-        diff = []
-        rawScores = re.findall(r"\d{2,3}&nbsp;-&nbsp;\d{2,3}", html)
-        rawTeams = re.findall(r";<a href=\"https://nba.hupu.com/teams/.*?\"", html)
-        for i in range(len(rawScores)):  # 季前赛待处理
-            scores = rawScores[i].split("&nbsp;-&nbsp;")
-            dif = int(scores[0]) - int(scores[1])
-            if rawTeams[i].endswith(team + "\""):
-                dif = - dif
-            diff.append(dif)
-        print("finish " + team)
-        ret[team] = diff[:-82]
+        ret[team] = getTeamScroesDiff(team)
     return ret
 
-def test(team): #for test
+def getTeamScroesDiff(team): #for test
     link = "https://nba.hupu.com/schedule/" + team
     html = getHTMLText(link)
     diff = []
@@ -177,7 +165,7 @@ global height
 height = 600
 teams = getTeamNames()
 allDiffs = getScoresDiff(teams)
+print(allDiffs)
 toExcel("C:/Users/willi/Desktop/NBA.xls", teams, allDiffs)
 for team in teams:
-    draw(team, test(team))
-
+    draw(team, allDiffs)
